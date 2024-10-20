@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gioco di Clic</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #clickButton {
+            padding: 20px 40px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #message {
+            font-size: 32px;
+            margin-top: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .final-message {
+            font-size: 48px;
+            color: rainbow;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<button id="clickButton">Cliccami!</button>
+<div id="message" class="hidden"></div>
+<div class="final-message" id="finalMessage">Bravo! Sei ufficialmente g3y</div>
+
+<script>
+    let clickCount = 0;
+    const messageElement = document.getElementById("message");
+    const clickButton = document.getElementById("clickButton");
+    const finalMessage = document.getElementById("finalMessage");
+
+    clickButton.addEventListener("click", () => {
+        clickCount++;
+        
+        if (clickCount === 1) {
+            messageElement.textContent = "Wow sei veramente bravo, adesso cliccami altre 7 volte";
+            messageElement.classList.remove("hidden");
+        } else if (clickCount <= 8) {
+            messageElement.textContent = "Wow sei veramente bravo, adesso cliccami altre 7 volte";
+        } else if (clickCount === 9) {
+            messageElement.textContent = "Ti prego insegnami, sei fortissimo, adesso cliccami altre 114 volte";
+        } else if (clickCount <= 123) {
+            messageElement.textContent = "Ti prego insegnami, sei fortissimo, adesso cliccami altre 114 volte";
+        } else if (clickCount === 124) {
+            messageElement.textContent = "Provaci adesso campione";
+            moveButton();
+        } else if (clickCount <= 133) {
+            moveButton();
+        } else if (clickCount === 134) {
+            clickButton.style.position = "static"; // Ferma lo spostamento
+            messageElement.textContent = "no more balls? vaivai, prova altre 4 volte";
+        } else if (clickCount <= 138) {
+            messageElement.textContent = "no more balls? vaivai, prova altre 4 volte";
+        } else if (clickCount === 139) {
+            finalMessage.style.display = "block";
+            clickButton.style.display = "none"; // Nasconde il pulsante
+        }
+    });
+
+    function moveButton() {
+        const randomX = Math.random() * (window.innerWidth - 200); // 200 è la larghezza del pulsante
+        const randomY = Math.random() * (window.innerHeight - 100); // 100 è l'altezza del pulsante
+        clickButton.style.position = "absolute";
+        clickButton.style.left = `${randomX}px`;
+        clickButton.style.top = `${randomY}px`;
+    }
+</script>
+
+</body>
+</html>
