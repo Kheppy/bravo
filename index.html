@@ -13,16 +13,21 @@
             margin: 0;
             font-family: Arial, sans-serif;
             text-align: center;
+            overflow: hidden;
+            position: relative;
         }
         #clickButton {
             padding: 20px 40px;
             font-size: 24px;
             cursor: pointer;
+            position: relative;
+            z-index: 10;
             transition: all 0.2s;
         }
         #message {
             font-size: 32px;
             margin-top: 20px;
+            z-index: 1;
         }
         .hidden {
             display: none;
@@ -32,6 +37,20 @@
             color: rainbow;
             display: none;
         }
+        #continueButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 12px;
+            display: none;
+        }
+        #randomButtons div {
+            position: absolute;
+            background-color: lightblue;
+            border: 1px solid black;
+            padding: 10px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -39,12 +58,21 @@
 <button id="clickButton">Cliccami!</button>
 <div id="message" class="hidden"></div>
 <div class="final-message" id="finalMessage">Bravo! Sei ufficialmente g3y</div>
+<button id="continueButton" class="hidden">Vuoi continuare?</button>
+
+<div id="randomButtons" class="hidden"></div>
 
 <script>
     let clickCount = 0;
+    let continueClickCount = 0;
     const messageElement = document.getElementById("message");
     const clickButton = document.getElementById("clickButton");
     const finalMessage = document.getElementById("finalMessage");
+    const continueButton = document.getElementById("continueButton");
+    const randomButtons = document.getElementById("randomButtons");
+    let randomButtonClickCount = 0;
+    let totalRandomButtons = 7;
+    let gameTimer;
 
     clickButton.addEventListener("click", () => {
         clickCount++;
@@ -52,6 +80,7 @@
         if (clickCount === 1) {
             messageElement.textContent = "Wow sei veramente bravo, adesso cliccami altre 7 volte";
             messageElement.classList.remove("hidden");
+            clickButton.style.position = "relative";
         } else if (clickCount <= 8) {
             messageElement.textContent = "Wow sei veramente bravo, adesso cliccami altre 7 volte";
         } else if (clickCount === 9) {
@@ -69,8 +98,27 @@
         } else if (clickCount <= 138) {
             messageElement.textContent = "no more balls? vaivai, prova altre 4 volte";
         } else if (clickCount === 139) {
+            // Nascondi tutto tranne il messaggio finale
             finalMessage.style.display = "block";
-            clickButton.style.display = "none"; // Nasconde il pulsante
+            clickButton.style.display = "none";
+            messageElement.classList.add("hidden");
+
+            setTimeout(() => {
+                continueButton.style.display = "block";
+            }, 1000);  // Dopo un secondo appare il bottone "Vuoi continuare?"
+        }
+    });
+
+    continueButton.addEventListener("click", () => {
+        continueClickCount++;
+        
+        if (continueClickCount <= 21) {
+            continueButton.textContent = `Vuoi continuare? (${21 - continueClickCount} clic rimanenti)`;
+        }
+        
+        if (continueClickCount === 21) {
+            continueButton.style.display = "none";
+            moveLargeInvisibleButton();
         }
     });
 
@@ -80,6 +128,77 @@
         clickButton.style.position = "absolute";
         clickButton.style.left = `${randomX}px`;
         clickButton.style.top = `${randomY}px`;
+    }
+
+    function moveLargeInvisibleButton() {
+        continueButton.textContent = "";
+        continueButton.style.position = "absolute";
+        continueButton.style.left = `${Math.random() * (window.innerWidth - 400)}px`;  // Posizione casuale
+        continueButton.style.top = `${Math.random() * (window.innerHeight - 200)}px`;  // Posizione casuale
+        continueButton.style.width = "300px";  // Diventa molto grande
+        continueButton.style.height = "150px";
+        continueButton.style.display = "block";
+        continueButton.style.opacity = "0";  // Rende il bottone invisibile
+        continueButton.style.zIndex = "2";  // Resta cliccabile
+    }
+
+    continueButton.addEventListener("click", () => {
+        finalMessage.textContent = "WOW! Pure da invisibile riesci a scovarmi, ma sei del mestiere?";
+        continueButton.style.display = "none";  // Nasconde il bottone invisibile
+
+        setTimeout(() => {
+            finalMessage.textContent = "Ultimo gioco per te, clicca tutti i tasti in meno di 5 secondi e scoprirai chi sei davvero, la tua essenza, la tua anima, il tuo IO";
+            setTimeout(generateRandomButtons, 10000);  // Attendi 10 secondi prima di generare i pulsanti
+        }, 5000);  // Attendi 5 secondi
+    });
+
+    function generateRandomButtons() {
+        randomButtons.innerHTML = "";  // Pulisci i tasti esistenti
+        randomButtons.classList.remove("hidden");
+        randomButtonClickCount = 0;
+        
+        for (let i = 0; i < totalRandomButtons; i++) {
+            const button = document.createElement("div");
+            button.style.left = `${Math.random() * (window.innerWidth - 100)}px`;
+            button.style.top = `${Math.random() * (window.innerHeight - 50)}px`;
+            button.textContent = "Cliccami!";
+            randomButtons.appendChild(button);
+
+            button.addEventListener("click", () => {
+                button.style.display = "none";  // Nascondi il tasto una volta cliccato
+                randomButtonClickCount++;
+                
+                if (randomButtonClickCount === totalRandomButtons) {
+                    clearTimeout(gameTimer);
+                    finalMessage.textContent = "Hai superato la prova! Dai dati raccolti posso affermare con certezza e sicurezza che sei veramente altamente re dei re dei g3y";
+                    randomButtons.classList.add("hidden");
+                }
+            });
+        }
+
+        // Avvia il timer per verificare se i tasti sono stati cliccati entro 5 secondi
+        gameTimer = setTimeout(() => {
+            if (randomButtonClickCount < totalRandomButtons) {
+                randomButtons.classList.add("hidden");
+                finalMessage.textContent = "Vuoi riprovare?";
+                const yesButton = document.createElement("button");
+                yesButton.textContent = "Si";
+                const noButton = document.createElement("button");
+                noButton.textContent = "No";
+
+                finalMessage.appendChild(yesButton);
+                finalMessage.appendChild(noButton);
+
+                yesButton.addEventListener("click", () => {
+                    finalMessage.innerHTML = "";  // Pulisci i messaggi
+                    generateRandomButtons();  // Ripeti il gioco
+                });
+
+                noButton.addEventListener("click", () => {
+                    finalMessage.textContent = "Lo sapevo, sei g3y";
+                });
+            }
+        }, 5000);
     }
 </script>
 
